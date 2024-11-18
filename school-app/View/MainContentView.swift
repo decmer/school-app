@@ -16,7 +16,7 @@ struct ContentView: View {
         
         TabView {
             StudentView().tabItem { Label("Srudent", systemImage: "house") }.tag(1)
-            Text("Tab Content 2").tabItem { Label("Setings", systemImage: "gear") }.tag(2)
+            Text("Tab Content").tabItem { Label("Setings", systemImage: "gear") }.tag(2)
         }
     }
 }
