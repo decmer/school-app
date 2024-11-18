@@ -6,26 +6,45 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct StudentView: View {
-    let items = Array(1...50)
+    @Environment(\.modelContext) private var modelContext
+    @Query private var school: [SchoolModel]
+    
+    @State var isAdd = false
+    
+    var searchSchool: [SchoolModel] {
+        return school
+    }
     
     var body: some View {
         NavigationStack {
-            LazyAdapList(preferredWidth: 300) {
-                ForEach(items, id: \.self) { item in
-                    Text("Item \(item)")
+            LazyAdapList(preferredWidth: 200) {
+                ForEach(searchSchool, id: \.self) { item in
+                    if let img = item.img {
+                        SchoolView(color: Color(hex: item.colorHex), image: Image(uiImage: (UIImage(data: img) ?? UIImage(named: "Schoolimg"))!)) {
+                            print("hola")
+                        }
                         .frame(width: 300, height: 300)
-                        .background(Color.red)
-                        .clipShape(RoundedRectangle(cornerRadius: 7))
-                        .foregroundColor(.white)
+                    } else {
+                        SchoolView(color: Color(hex: item.colorHex), image: nil) {
+                            print("hola")
+                        }
+                        .frame(width: 300, height: 300)
+                    }
                 }
+                
             }
             .navigationTitle("Schools")
+            
             .toolbar {
                 Button("Add") {
-                    
+                    isAdd = true
                 }
+            }
+            .sheet(isPresented: $isAdd) {
+                SchoolAddView()
             }
         }
     }
@@ -33,4 +52,5 @@ struct StudentView: View {
 
 #Preview {
     StudentView()
+        .modelContainer(for: SchoolModel.self, inMemory: true)
 }

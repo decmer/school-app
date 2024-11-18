@@ -6,8 +6,11 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct SchoolAddView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Query private var school: [SchoolModel]
     
     @State private var name: String = ""
     @State private var img: Data?
@@ -58,13 +61,14 @@ struct SchoolAddView: View {
             }
             .toolbar(content: {
                 Button("Create") {
-                    
+                    let schoolAux = SchoolModel(id: UUID(), name: name, img: img, colorHex: color.toHex()!)
+                    modelContext.insert(schoolAux)
                 }
             })
             .fileImporter(
                 isPresented: $isFileImporterPresented,
-                allowedContentTypes: [UTType.image], // Permite seleccionar solo imágenes
-                allowsMultipleSelection: false // Deshabilita la selección múltiple
+                allowedContentTypes: [UTType.image],
+                allowsMultipleSelection: false
             ) { result in
                 switch result {
                 case .success(let urls):
@@ -84,4 +88,5 @@ import UniformTypeIdentifiers
 
 #Preview {
     SchoolAddView()
+        .modelContainer(for: SchoolModel.self, inMemory: true)
 }

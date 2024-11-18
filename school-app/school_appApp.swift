@@ -27,6 +27,7 @@ struct school_appApp: App {
         WindowGroup {
             ContentView()
         }
+        .environment(ViewModel(context: sharedModelContainer.mainContext))
         .modelContainer(sharedModelContainer)
     }
 }

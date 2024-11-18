@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct School: View {
+struct SchoolView: View {
     var color: Color
     var image: Image?
     var action: () -> Void
@@ -42,22 +42,17 @@ struct School: View {
 }
 
 #Preview {
-    let size:CGFloat = 170
+    let size:CGFloat = 270
     if let uiImage = UIImage(named: "Schoolimg") {
         HStack {
-            School(color: .blue, image: Image(uiImage: uiImage)) {
-                print("hola")
-            }
-            .frame(width: size, height: size)
-            School(color: .blue, image: Image(uiImage: uiImage)) {
+            SchoolView(color: .blue, image: Image(uiImage: uiImage)) {
                 print("hola")
             }
             .frame(width: size, height: size)
         }
         
-        
     } else {
-        School(color: .blue, image: nil) {
+        SchoolView(color: .blue, image: nil) {
             
         }
             .frame(width: 200, height: 200)
