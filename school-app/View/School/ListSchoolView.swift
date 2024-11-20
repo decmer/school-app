@@ -10,7 +10,7 @@ import SwiftData
 
 struct StudentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var school: [SchoolModel]
+    @Query var school: [SchoolModel]
     
     @State var isAdd = false
     
@@ -21,17 +21,12 @@ struct StudentView: View {
     var body: some View {
         NavigationStack {
             LazyAdapList(preferredWidth: 200) {
-                ForEach(searchSchool, id: \.self) { item in
-                    if let img = item.img {
-                        SchoolView(color: Color(hex: item.colorHex), image: Image(uiImage: (UIImage(data: img) ?? UIImage(named: "Schoolimg"))!)) {
-                            print("hola")
-                        }
-                        .frame(width: 300, height: 300)
-                    } else {
-                        SchoolView(color: Color(hex: item.colorHex), image: nil) {
-                            print("hola")
-                        }
-                        .frame(width: 300, height: 300)
+                ForEach(school, id: \.self) { item in
+                    NavigationLink {
+                        SchoolView(institute: item)
+                    } label: {
+                        SchoolPreview(model: item)
+                            .frame(width: 300, height: 300)
                     }
                 }
                 
