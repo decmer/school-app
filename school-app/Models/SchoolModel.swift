@@ -7,17 +7,19 @@
 
 import Foundation
 import SwiftData
-import SwiftUI
 
 @Model
 final class SchoolModel {
     var id: UUID
+    @Relationship()
+    var classModel: [ClassModel]
     var name: String
     var img: Data?
     var colorHex: String
     
-    init(id: UUID, name: String, img: Data?, colorHex: String) {
+    init(id: UUID, classModel: [ClassModel], name: String, img: Data? = nil, colorHex: String) {
         self.id = id
+        self.classModel = classModel
         self.name = name
         self.img = img
         self.colorHex = colorHex

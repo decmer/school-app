@@ -104,11 +104,11 @@ struct SchoolPreview: View {
 
 #Preview {
     let size:CGFloat = 160
-    if let uiImage = UIImage(named: "Schoolimgh") {
+    if let uiImage = UIImage(named: "Schoolimg") {
         ScrollView {
             VStack {
                 HStack {
-                    SchoolPreview(model: SchoolModel(id: UUID(), name: "pepe", img: uiImage.pngData()!, colorHex: "FF5733"))
+                    SchoolPreview(model: SchoolModel(id: UUID(), classModel: [], name: "pepe", img: uiImage.pngData()!, colorHex: "FF5733"))
                     .padding(20)
                 }
             }
@@ -118,7 +118,7 @@ struct SchoolPreview: View {
         ScrollView {
             VStack {
                 HStack {
-                    SchoolPreview(model: SchoolModel(id: UUID(), name: "pepe", img: nil, colorHex: "FF5733"))
+                    SchoolPreview(model: SchoolModel(id: UUID(), classModel: [], name: "pepe", img: nil, colorHex: "FF5733"))
                     .padding(20)
                 }
             }

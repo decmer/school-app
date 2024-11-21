@@ -13,6 +13,7 @@ struct school_appApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             SchoolModel.self,
+            ClassModel.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 

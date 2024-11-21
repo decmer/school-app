@@ -53,5 +53,5 @@ struct SchoolView: View {
 }
 
 #Preview {
-    SchoolView(institute: SchoolModel(id: .init(), name: "School Name", img: nil, colorHex: "#000000"))
+    SchoolView(institute: SchoolModel(id: .init(), classModel: [], name: "School Name", img: nil, colorHex: "#000000"))
 }

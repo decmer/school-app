@@ -10,6 +10,7 @@ import SwiftData
 
 struct ClassAddView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment private var schoolModel: SchoolModel
     
     @State private var name: String = ""
     @State private var color: Color = .white
@@ -30,7 +31,7 @@ struct ClassAddView: View {
             }
             .toolbar(content: {
                 Button("Create") {
-                    let schoolAux = ClassModel(id: .init(), schoolModel: <#SchoolModel#>, name: name, colorHex: color.toHex()!)
+                    let schoolAux = ClassModel(id: .init(), schoolModel: schoolModel, name: name, colorHex: color.toHex()!)
                     modelContext.insert(schoolAux)
                     do {
                         try modelContext.save()
@@ -42,8 +43,4 @@ struct ClassAddView: View {
             })
         }
     }
-}
-
-#Preview {
-    ClassAddView()
 }

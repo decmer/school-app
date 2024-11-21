@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 
-struct StudentView: View {
+struct ListSchoolView: View {
     @Environment(\.modelContext) private var modelContext
     @Query var school: [SchoolModel]
     
@@ -24,6 +24,7 @@ struct StudentView: View {
                 ForEach(school, id: \.self) { item in
                     NavigationLink {
                         SchoolView(institute: item)
+                            .environment(item)
                     } label: {
                         SchoolPreview(model: item)
                             .frame(width: 300, height: 300)
@@ -46,6 +47,6 @@ struct StudentView: View {
 }
 
 #Preview {
-    StudentView()
+    ListSchoolView()
         .modelContainer(for: SchoolModel.self, inMemory: true)
 }
