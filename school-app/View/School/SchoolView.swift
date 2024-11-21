@@ -40,25 +40,35 @@ struct SchoolView: View {
         }
     }
     
-    func item(_ name: String, width: CGFloat)-> some View {
+    func item(_ name: String, nameSimbol: String, width: CGFloat)-> some View {
         NavigationLink {
             Text("Secretariat 1")
+                
         } label: {
-            ZStack {
-                Text(name)
-                    .padding(7)
-                    .foregroundStyle(.inverse)
-                    .frame(width: width * 0.6)
-                    .background(content: {
-                        RoundedRectangle(cornerRadius: 7)
-                            
-                            .foregroundStyle(Color.tPrimary)
-                    })
-            }
+            itemview(name, nameSimbol: nameSimbol, width: width)
         }
+    }
+    
+    func itemview(_ name: String, nameSimbol: String, width: CGFloat) -> some View {
+        RoundedRectangle(cornerRadius: 7)
+            .frame(width: 150, height: 100)
+            .foregroundStyle(LinearGradient.harmoniousGradient(baseColor: Color(hex: institute.colorHex)))
+            .overlay {
+                VStack {
+                    Spacer()
+                    HStack {
+                        Image(systemName: nameSimbol)
+                            .foregroundStyle(Color(hex: institute.colorHex).contrastingColor())
+                        Text(name)
+                            .font(.headline)
+                            .foregroundStyle(Color(hex: institute.colorHex).contrastingColor())
+                    }
+                    Spacer()                }
+            }
+        
     }
 }
 
 #Preview {
-    SchoolView(institute: SchoolModel(id: .init(), classModel: [], name: "School Name", img: nil, colorHex: "#000000"))
+    SchoolView(institute: SchoolModel(id: .init(), classModel: [], name: "School Name", img: nil, colorHex: Color.green.toHex()!))
 }

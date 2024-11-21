@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import UniformTypeIdentifiers
 
 struct SchoolAddView: View {
     @Environment(\.modelContext) private var modelContext
@@ -29,6 +30,7 @@ struct SchoolAddView: View {
                         ColorPicker("Color", selection: $color)
                     }
                     
+
                     Section {
                         VStack {
                             HStack {
@@ -39,18 +41,14 @@ struct SchoolAddView: View {
                                 .buttonStyle(.bordered)
                                 Spacer()
                             }
-                            HStack {
-                                Spacer()
-                                if let img, let img = UIImage(data: img){
+                            if let img, let img = UIImage(data: img){
+                                HStack {
+                                    Spacer()
                                     Image(uiImage: img)
                                         .resizable()
                                         .scaledToFit()
                                         .frame(width: geometry.size.width*0.8, height: geometry.size.width*0.8)
                                         .clipShape(RoundedRectangle(cornerRadius: 20))
-                                } else {
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .frame(width: geometry.size.width*0.8, height: geometry.size.width*0.8)
-                                        .foregroundStyle(.red)
                                 }
                                 Spacer()
                             }
@@ -61,6 +59,9 @@ struct SchoolAddView: View {
             }
             .toolbar(content: {
                 Button("Create") {
+                    if let cgColor = UIColor(color).cgColor.copyConvertedToSRGB() {
+                        color = Color(cgColor)
+                    }
                     let schoolAux = SchoolModel(id: UUID(), classModel: [], name: name, img: img, colorHex: color.toHex()!)
                     modelContext.insert(schoolAux)
                     do {
@@ -86,12 +87,4 @@ struct SchoolAddView: View {
             }
         }
     }
-}
-
-import SwiftUI
-import UniformTypeIdentifiers
-
-#Preview {
-    SchoolAddView()
-        .modelContainer(for: SchoolModel.self, inMemory: true)
 }

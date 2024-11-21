@@ -13,93 +13,75 @@ struct SchoolPreview: View {
     var model: SchoolModel
     
     var body: some View {
-        GeometryReader { GeometryProxy in
-            if let image = model.img, let image = UIImage(data: image) {
-                Image(uiImage: image)
-                    .resizable()
-                    .frame(width: GeometryProxy.size.width , height: 200)
-                    .scaledToFit()
-                    .clipShape(RoundedRectangle(cornerRadius: 7))
-                    .foregroundStyle(Color(hex: model.colorHex))
-                    .overlay {
-                        VStack {
-                            HStack {
-                                Spacer()
-                                Menu {
-                                    Button(action: removeItem) {
-                                        Text("Delete")
-                                    }
-                                } label: {
-                                    Image(systemName: "ellipsis")
-                                        .foregroundStyle(.black)
-                                        .background {
-                                            Circle()
-                                                .frame(width: 30, height: 30)
-                                                .foregroundStyle(.white)
+        RoundedRectangle(cornerRadius: 7)
+            .foregroundStyle(Color(hex: model.colorHex))
+            .overlay {
+                VStack {
+                    if let image = model.img, let image = UIImage(data: image) {
+                        Image(uiImage: image)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(maxHeight: 155)
+                            .clipShape(RoundedRectangle(cornerRadius: 7))
+                            .overlay {
+                                VStack {
+                                    HStack {
+                                        Spacer()
+                                        Menu {
+                                            Button(action: removeItem) {
+                                                Text("Delete")
+                                            }
+                                        } label: {
+                                            Image(systemName: "ellipsis")
+                                                .foregroundStyle(.black)
+                                                .background {
+                                                    Circle()
+                                                        .frame(width: 30, height: 30)
+                                                        .foregroundStyle(.white)
+                                                }
+                                                .padding(15)
                                         }
-                                        .padding(15)
+                                    }
+                                    Spacer()
                                 }
                             }
-                            Spacer()
                             
-                            HStack {
-                                Text(model.name)
-                                    .padding(4)
-                                    .foregroundStyle(.black)
-                                    .background(content: {
-                                        RoundedRectangle(cornerRadius: 7)
-                                            .foregroundStyle(.white)
-                                    })
-                                    .padding(4)
-                                Spacer()
-                            }
-                        }
-                    }
-            } else {
-                RoundedRectangle(cornerRadius: 7)
-                    .frame(width: GeometryProxy.size.width , height: 200)
-                    .foregroundStyle(Color(hex: model.colorHex))
-                    .overlay {
-                        VStack {
-                            HStack {
-                                Spacer()
-                                Menu {
-                                    Button(action: removeItem) {
-                                        Text("Delete")
-                                    }
-                                } label: {
-                                    Image(systemName: "ellipsis")
-                                        .foregroundStyle(.black)
-                                        .background {
-                                            Circle()
-                                                .frame(width: 30, height: 30)
-                                                .foregroundStyle(.white)
-                                        }
-                                        .padding(15)
+                    } else {
+                        HStack {
+                            Spacer()
+                            Menu {
+                                Button(action: removeItem) {
+                                    Text("Delete")
                                 }
-                            }
-                            Spacer()
-                            
-                            HStack {
-                                Text(model.name)
-                                    .padding(4)
+                            } label: {
+                                Image(systemName: "ellipsis")
                                     .foregroundStyle(.black)
-                                    .background(content: {
-                                        RoundedRectangle(cornerRadius: 7)
+                                    .background {
+                                        Circle()
+                                            .frame(width: 30, height: 30)
                                             .foregroundStyle(.white)
-                                    })
-                                    .padding(4)
-                                Spacer()
+                                    }
+                                    .padding(15)
                             }
                         }
+                        Spacer()
                     }
+                    Spacer()
+                    HStack {
+                        Text(model.name)
+                            .foregroundStyle(Color(hex: model.colorHex).contrastingColor())
+                            .padding([.bottom, .horizontal], 15)
+                        Spacer()
+                    }
+                }
             }
-        }
     }
     
     func removeItem() {
         modelContext.delete(model)
     }
+    //            if let image = model.img, let image = UIImage(data: image) {
+
 }
 
 #Preview {
@@ -107,10 +89,10 @@ struct SchoolPreview: View {
     if let uiImage = UIImage(named: "Schoolimg") {
         ScrollView {
             VStack {
-                HStack {
-                    SchoolPreview(model: SchoolModel(id: UUID(), classModel: [], name: "pepe", img: uiImage.pngData()!, colorHex: "FF5733"))
-                    .padding(20)
-                }
+                    SchoolPreview(model: SchoolModel(id: UUID(), classModel: [], name: "peh jdshbgfj dgfhdjsg hjsdfg hjsdfgh sdfghsdjfg sdhfg hjpe", img: uiImage.pngData()!, colorHex: "FF5733"))
+                    .frame(width: 350, height: 200)
+                SchoolPreview(model: SchoolModel(id: UUID(), classModel: [], name: "peh jdshbgfj dgfhdjsg hjsdfg hjsdfgh sdfghsdjfg sdhfg hjpe", img: uiImage.pngData()!, colorHex: "FF5733"))
+                    .frame(width: 300, height: 200)
             }
         }
         

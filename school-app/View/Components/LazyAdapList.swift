@@ -8,31 +8,47 @@
 import SwiftUI
 
 struct LazyAdapList<Content> : View where Content : View {
-    let items = Array(1...50)
+    let items = Array(1...5)
     var preferredWidth: CGFloat
     var data: () -> Content
     
+    init(preferredWidth: CGFloat, data: @escaping () -> Content) {
+        self.preferredWidth = preferredWidth + preferredWidth * 0.1
+        self.data = data
+    }
     
     var body: some View {
         GeometryReader { geometry in
             ScrollView {
-                let columns = [GridItem(.adaptive(minimum: calculateColumnWidth(for: geometry.size.width)))]
-                LazyVGrid(columns: columns, spacing: 10, content: data)
-                .padding()
+                let columns = gridCal(for: geometry.size.width)
+                LazyVGrid(columns: columns, spacing: calculateSpacing(for: geometry.size.width), content: data)
             }
         }
     }
-    private func calculateColumnWidth(for screenWidth: CGFloat) -> CGFloat {
-        if preferredWidth <= 50 { return 50 }
+    
+    func gridCal(for screenWidth: CGFloat) -> [GridItem] {
+        var gridCalAux = [GridItem]()
         let maxColumns = Int(screenWidth / preferredWidth)
-        let actualWidth = screenWidth / CGFloat(maxColumns)
-        return max(actualWidth, preferredWidth)
+        for _ in 0..<maxColumns {
+            gridCalAux.append(.init(.adaptive(minimum: preferredWidth)))
+        }
+        return gridCalAux
+    }
+    
+    private func calculateSpacing(for screenWidth: CGFloat) -> CGFloat {
+        if preferredWidth <= 50 { return 50 }
+        if screenWidth < preferredWidth {
+            
+        }
+        let maxColumns = Int(screenWidth / preferredWidth)
+        if maxColumns == 1 { return 24 }
+        return (screenWidth - CGFloat(maxColumns) * preferredWidth) / CGFloat(maxColumns)
     }
 }
 
 #Preview {
-    LazyAdapList(preferredWidth: 250) {
-        ForEach(Range(1...50), id: \.self) { i in
+    LazyAdapList(preferredWidth: 100) {
+        ForEach(Range(1...5), id: \.self) { i in
             Text("Item\(i)")
                 .frame(width: 100, height: 100)
                 .background(Color.red)

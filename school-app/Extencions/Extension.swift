@@ -51,3 +51,58 @@ extension Color {
         return nil
     }
 }
+
+extension Color {
+    /// Calcula un color que contraste con el actual (claro si el color es oscuro y viceversa).
+    func contrastingColor() -> Color {
+        // Convertir el color actual a valores de RGB
+        let uiColor = UIColor(self)
+        guard let components = uiColor.cgColor.components else { return .black }
+
+        // Obtener los valores de los canales RGB (normalizados a [0, 1])
+        let red = components[0]
+        let green = components[1]
+        let blue = components[2]
+
+        // Calcular la luminancia relativa
+        let luminance = 0.2126 * red + 0.7152 * green + 0.0722 * blue
+
+        // Si la luminancia es baja, devolver un color claro; de lo contrario, uno oscuro
+        return luminance < 0.5 ? .white : .black
+    }
+}
+
+extension Color {
+    func complementaryColor() -> Color {
+        let uiColor = UIColor(self)
+        let components = uiColor.cgColor.components ?? [0, 0, 0, 1]
+
+        let red = 1 - components[0]
+        let green = 1 - components[1]
+        let blue = 1 - components[2]
+        
+        return Color(red: red, green: green, blue: blue)
+    }
+}
+extension LinearGradient {
+    static func harmoniousGradient(baseColor: Color) -> LinearGradient {
+        let complementary = baseColor.complementaryColor()
+
+        return LinearGradient(gradient: Gradient(colors: [baseColor, complementary]),
+                              startPoint: .topLeading,
+                              endPoint: .bottomTrailing)
+    }
+    
+}
+
+
+extension CGColor {
+    /// Convierte el color actual al espacio sRGB si no lo está
+    func copyConvertedToSRGB() -> CGColor? {
+        guard let sRGBSpace = CGColorSpace(name: CGColorSpace.sRGB),
+              colorSpace?.name != sRGBSpace.name else {
+            return self // Ya es sRGB
+        }
+        return converted(to: sRGBSpace, intent: .defaultIntent, options: nil)
+    }
+}

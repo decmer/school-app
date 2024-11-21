@@ -20,14 +20,15 @@ struct ListSchoolView: View {
     
     var body: some View {
         NavigationStack {
-            LazyAdapList(preferredWidth: 200) {
+            LazyAdapList(preferredWidth: 350) {
                 ForEach(school, id: \.self) { item in
                     NavigationLink {
                         SchoolView(institute: item)
                             .environment(item)
                     } label: {
                         SchoolPreview(model: item)
-                            .frame(width: 300, height: 300)
+                            .frame(width: 350, height: 200)
+                            .padding(.vertical, 12)
                     }
                 }
                 
