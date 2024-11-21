@@ -9,6 +9,15 @@ import SwiftUI
 
 struct SchoolView: View {
     let institute: SchoolModel
+    private let titles = [
+        ["Class", "graduationcap"],
+        ["Schedule", "calendar"],
+        ["Release", "arrow.up.circle"],
+        ["Fouls", "exclamationmark.circle"],
+        ["Information", "info.circle"],
+        ["Incidents", "exclamationmark.triangle"]]
+    
+    let color = Color.orange
     
     var body: some View {
         GeometryReader { geometry in
@@ -17,13 +26,11 @@ struct SchoolView: View {
                     Spacer()
                     VStack(spacing: 30) {
                         Spacer()
-                        item("Class", width: geometry.size.width)
-                        item("Schedule", width: geometry.size.width)
-                        item("Release", width: geometry.size.width)
-                        item("Fouls", width: geometry.size.width)
-                        item("Information", width: geometry.size.width)
-                        item("Incidents", width: geometry.size.width)
-                        item("Secretariat", width: geometry.size.width)
+                        LazyAdapList(preferredWidth: 150) {
+                            ForEach(titles, id: \.self) { title in
+                                item(title[0],nameSimbol: title[1] , width: geometry.size.width)
+                            }
+                        }
                         Spacer()
                     }
                     Spacer()
