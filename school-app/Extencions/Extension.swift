@@ -106,3 +106,8 @@ extension CGColor {
         return converted(to: sRGBSpace, intent: .defaultIntent, options: nil)
     }
 }
+
+extension Bool {
+    @State static var trueState: Bool = true
+    @State static var falseState: Bool = false
+}

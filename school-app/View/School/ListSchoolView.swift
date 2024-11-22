@@ -41,7 +41,7 @@ struct ListSchoolView: View {
                 }
             }
             .sheet(isPresented: $isAdd) {
-                SchoolAddView()
+                SchoolAddView(isPresented: $isAdd)
             }
         }
     }

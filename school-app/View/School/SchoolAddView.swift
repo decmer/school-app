@@ -7,16 +7,19 @@
 
 import SwiftUI
 import SwiftData
+import PhotosUI
 import UniformTypeIdentifiers
 
 struct SchoolAddView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var school: [SchoolModel]
     
     @State private var name: String = ""
     @State private var img: Data?
     @State private var color: Color = .white
     @State private var isFileImporterPresented = false
+    @State private var selectedItem: PhotosPickerItem? = nil
+
+    @Binding var isPresented: Bool
     
     var body: some View {
         NavigationStack {
@@ -32,27 +35,29 @@ struct SchoolAddView: View {
                     
 
                     Section {
-                        VStack {
-                            HStack {
-                                Spacer()
-                                Button("Select photo") {
-                                    isFileImporterPresented.toggle()
+                        PhotosPicker(
+                                    selection: $selectedItem,
+                                    matching: .images,
+                                    photoLibrary: .shared()) {
+                                        Text("Selecciona una foto")
+                                    }
+                                    .onChange(of: selectedItem) { newItem, _ in
+                                        Task {
+                                            if let selectedItem, let data = try? await selectedItem.loadTransferable(type: Data.self) {
+                                                img = data
+                                            }
+                                        }
+                                    }
+                                if let img, let uiImage = UIImage(data: img) {
+                                    HStack {
+                                        Spacer()
+                                        Image(uiImage: uiImage)
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 200, height: 200)
+                                        Spacer()
+                                    }
                                 }
-                                .buttonStyle(.bordered)
-                                Spacer()
-                            }
-                            if let img, let img = UIImage(data: img){
-                                HStack {
-                                    Spacer()
-                                    Image(uiImage: img)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: geometry.size.width*0.8, height: geometry.size.width*0.8)
-                                        .clipShape(RoundedRectangle(cornerRadius: 20))
-                                }
-                                Spacer()
-                            }
-                        }
                     }
                 }
                 
@@ -69,22 +74,27 @@ struct SchoolAddView: View {
                     } catch {
                         print("Error al guardar: \(error.localizedDescription)")
                     }
+                    isPresented = false
                 }
             })
-            .fileImporter(
-                isPresented: $isFileImporterPresented,
-                allowedContentTypes: [UTType.image],
-                allowsMultipleSelection: false
-            ) { result in
-                switch result {
-                case .success(let urls):
-                    if let selectedFileURL = urls.first, let imageData = try? Data(contentsOf: selectedFileURL) {
-                        img = imageData
-                    }
-                case .failure(let error):
-                    print("Error al seleccionar archivo: \(error.localizedDescription)")
-                }
-            }
         }
+    }
+}
+
+
+
+#Preview {
+    do {
+        let previewContainer = try ModelContainer(for: SchoolModel.self, ClassModel.self)
+
+        previewContainer.mainContext.insert(Preview.schoolModel)
+        previewContainer.mainContext.insert(Preview.classModel1)
+        previewContainer.mainContext.insert(Preview.classModel2)
+
+        return SchoolAddView(isPresented: Bool.$trueState)
+            .modelContainer(previewContainer)
+            .environment(Preview.schoolModel)
+    } catch {
+        return Text("Error: \(error)")
     }
 }

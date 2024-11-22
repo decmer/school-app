@@ -10,11 +10,13 @@ import SwiftData
 
 struct ClassAddView: View {
     @Environment(\.modelContext) private var modelContext
-    @Environment private var schoolModel: SchoolModel
+    @Environment(SchoolModel.self) private var schoolModel
     
     @State private var name: String = ""
     @State private var color: Color = .white
-    
+
+    @Binding var isPresented: Bool
+
     var body: some View {
         NavigationStack {
             GeometryReader { geometry in
@@ -31,6 +33,9 @@ struct ClassAddView: View {
             }
             .toolbar(content: {
                 Button("Create") {
+                    if let cgColor = UIColor(color).cgColor.copyConvertedToSRGB() {
+                        color = Color(cgColor)
+                    }
                     let schoolAux = ClassModel(id: .init(), schoolModel: schoolModel, name: name, colorHex: color.toHex()!)
                     modelContext.insert(schoolAux)
                     do {
@@ -38,9 +43,25 @@ struct ClassAddView: View {
                     } catch {
                         print("Error al guardar: \(error.localizedDescription)")
                     }
-                    
+                    isPresented = false
                 }
             })
         }
+    }
+}
+
+#Preview {
+    do {
+        let previewContainer = try ModelContainer(for: SchoolModel.self, ClassModel.self)
+
+        previewContainer.mainContext.insert(Preview.schoolModel)
+        previewContainer.mainContext.insert(Preview.classModel1)
+        previewContainer.mainContext.insert(Preview.classModel2)
+
+        return ClassAddView(isPresented: Bool.$trueState)
+            .modelContainer(previewContainer)
+            .environment(Preview.schoolModel)
+    } catch {
+        return Text("Error: \(error)")
     }
 }

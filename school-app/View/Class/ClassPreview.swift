@@ -8,12 +8,13 @@
 import SwiftUI
 
 struct ClassPreview: View {
+    @Environment(\.modelContext) private var modelContext
     
     let classModel: ClassModel
     
     var body: some View {
         RoundedRectangle(cornerRadius: 7)
-            
+            .foregroundStyle(Color(hex: classModel.colorHex))
             .overlay {
                 VStack {
                     HStack {
@@ -21,16 +22,20 @@ struct ClassPreview: View {
                             .foregroundStyle(.white)
                             .padding(7)
                         Spacer()
-                        Image(systemName: "ellipsis")
-                            .onTapGesture {
-                                
+                        Menu {
+                            Button(action: removeItem) {
+                                Text("Delete")
                             }
-                            .background {
-                                Circle()
-                                    .frame(width: 30, height: 30)
-                                    .foregroundStyle(.white)
-                            }
-                            .padding(19)
+                        } label: {
+                            Image(systemName: "ellipsis")
+                                .foregroundStyle(.black)
+                                .background {
+                                    Circle()
+                                        .frame(width: 30, height: 30)
+                                        .foregroundStyle(.white)
+                                }
+                                .padding(15)
+                        }
                     }
                     RoundedRectangle(cornerRadius: 7)
                         .frame(width: .infinity, height: 1)
@@ -53,4 +58,12 @@ struct ClassPreview: View {
                 }
             }
     }
+    func removeItem() {
+        modelContext.delete(classModel)
+    }
+}
+
+#Preview {
+    ClassPreview(classModel: Preview.classModel1)
+        .frame(width: 250, height: 250)
 }
