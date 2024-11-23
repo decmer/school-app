@@ -7,98 +7,268 @@
 
 import SwiftUI
 
-
 struct CalendarView: View {
-    @State private var currentDate = Date()
     @State private var selectedDate = Date()
-    @State private var dragOffset = CGSize.zero  // Cambiado de @GestureState a @State
+    @State private var currentMonth = Date()
+    @State private var showMonthPicker = false
+    @State private var selectedMonth = Calendar.current.component(.month, from: Date())
+    @State private var selectedYear = Calendar.current.component(.year, from: Date())
+    @State private var isYearPickerVisible = false
+    @State private var tempSelectedYear: Int = Calendar.current.component(.year, from: Date())
+    @State private var dragOffset: CGFloat = 0
 
-    private var calendar: Calendar { Calendar.current }
-
-    // Obtener el primer día del mes
-    private func getFirstDayOfMonth() -> Date {
-        return calendar.date(from: calendar.dateComponents([.year, .month], from: currentDate)) ?? Date()
+    private var calendar: Calendar {
+        Calendar.current
     }
 
-    // Obtener la cantidad de días en el mes
-    private func getDaysInMonth() -> [Int] {
-        let range = calendar.range(of: .day, in: .month, for: getFirstDayOfMonth())!
-        return Array(range)
+    private var months: [String] {
+        calendar.monthSymbols
     }
 
-    // Obtener el primer día de la semana del mes
-    private func getFirstWeekday() -> Int {
-        return calendar.component(.weekday, from: getFirstDayOfMonth())
+    // Genera un rango de años de 50 años antes hasta 50 años después del año seleccionado
+    private var years: [Int] {
+        let lowerBound = selectedYear - 50
+        let upperBound = selectedYear + 50
+        return Array(lowerBound...upperBound)
     }
 
-    // Obtener una fecha a partir de un número de día
-    private func getDateFor(day: Int) -> Date {
-        let components = DateComponents(year: calendar.component(.year, from: currentDate),
-                                        month: calendar.component(.month, from: currentDate),
-                                        day: day)
-        return calendar.date(from: components) ?? Date()
+    private var daysInMonth: [Date] {
+        let range = calendar.range(of: .day, in: .month, for: currentMonth)!
+        let firstDayOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: currentMonth))!
+        var days: [Date] = []
+
+        // Calcular el día de la semana del primer día del mes.
+        let weekdayOfFirstDay = (calendar.component(.weekday, from: firstDayOfMonth) - calendar.firstWeekday + 7) % 7
+        
+        // Agregar días vacíos antes del primer día del mes.
+        for _ in 0..<weekdayOfFirstDay {
+            days.append(Date.distantPast) // Días vacíos
+        }
+
+        // Agregar los días reales del mes.
+        for day in range {
+            if let date = calendar.date(byAdding: .day, value: day - 1, to: firstDayOfMonth) {
+                days.append(date)
+            }
+        }
+
+        // Completar la última fila con días vacíos si es necesario.
+        let totalDaysInGrid = days.count
+        let remainingDays = totalDaysInGrid % 7
+        if remainingDays > 0 {
+            let daysToAdd = 7 - remainingDays
+            for _ in 0..<daysToAdd {
+                days.append(Date.distantPast) // Agregar días vacíos
+            }
+        }
+
+        return days
+    }
+
+    private var startOfMonth: Date {
+        calendar.date(from: calendar.dateComponents([.year, .month], from: currentMonth))!
     }
 
     var body: some View {
-        VStack {
-            // Título con el mes y el año
-            Text("\(calendar.monthSymbols[calendar.component(.month, from: currentDate) - 1]) \(calendar.component(.year, from: currentDate))")
-                .font(.title)
-                .padding()
-
-            // Calendario
-            ScrollView(.vertical) {
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7)) {
-                    // Días de la semana
-                    ForEach(1..<8) { day in
-                        Text(self.calendar.weekdaySymbols[day - 1])
-                            .fontWeight(.bold)
+        ZStack {
+            VStack {
+                HStack {
+                    Button(action: {
+                        showMonthPicker = true
+                    }) {
+                        Text(months[selectedMonth - 1])
+                            .font(.title)
                             .padding()
                     }
-
-                    // Obtener los días del mes y llenar los cuadros
-                    let days = getDaysInMonth()
-                    let firstWeekday = getFirstWeekday()
-
-                    // Vacíos al principio del mes (para alinear con el primer día de la semana)
-                    ForEach(0..<firstWeekday - 1, id: \.self) { _ in
-                        Text("")
-                            .frame(width: 40, height: 40)
+                    .actionSheet(isPresented: $showMonthPicker) {
+                        ActionSheet(
+                            title: Text("Seleccionar mes"),
+                            buttons: months.enumerated().map { index, month in
+                                .default(Text(month)) {
+                                    selectedMonth = index + 1
+                                    updateCurrentMonth()
+                                }
+                            } + [.cancel()]
+                        )
                     }
 
-                    // Los días del mes
-                    ForEach(days, id: \.self) { day in
-                        Button(action: {
-                            self.selectedDate = getDateFor(day: day)
-                        }) {
-                            Text("\(day)")
-                                .frame(width: 40, height: 40)
-                                .background(self.selectedDate == getDateFor(day: day) ? Color.blue : Color.clear)
-                                .cornerRadius(5)
-                                .foregroundColor(self.selectedDate == getDateFor(day: day) ? .white : .black)
+                    Button(action: {
+                        withAnimation {
+                            isYearPickerVisible = true
                         }
-                        .padding(2)
+                    }) {
+                        Text("\(String(selectedYear))")
+                            .font(.title)
+                            .padding()
                     }
                 }
-                .padding(.horizontal)
+
+                // Mostrar días de la semana
+                let weekdaySymbols = calendar.shortWeekdaySymbols
+                HStack {
+                    ForEach(weekdaySymbols, id: \.self) { weekday in
+                        Text(weekday)
+                            .frame(maxWidth: .infinity)
+                            .padding(.top, 10)
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
+                }
+
+                // Mostrar los días del mes
+                let rows = daysInMonth.chunked(into: 7) // Agrupar los días en semanas
+                ForEach(rows, id: \.self) { row in
+                    HStack {
+                        ForEach(row, id: \.self) { day in
+                            if day != Date.distantPast { // No mostrar los días vacíos
+                                Button(action: {
+                                    selectedDate = day
+                                }) {
+                                    Text("\(calendar.component(.day, from: day))")
+                                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                        .padding(8)
+                                        .background(selectedDate == day ? Color.blue : Color.clear)
+                                        .foregroundColor(selectedDate == day ? .white : .primary)
+                                        .cornerRadius(8)
+                                }
+                            } else {
+                                Text("")
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            }
+                        }
+                    }
+                }
             }
-            .gesture(DragGesture()
+
+            // Si el Picker de año es visible, superponerlo en la parte superior
+            
+                
+        }
+        .ignoresSafeArea()
+        .padding()
+        .gesture(
+            DragGesture()
                 .onChanged { value in
-                    dragOffset = value.translation
+                    dragOffset = value.translation.width
                 }
                 .onEnded { value in
-                    if dragOffset.height < -100 { // Deslizar hacia arriba
-                        self.currentDate = calendar.date(byAdding: .month, value: 1, to: currentDate) ?? currentDate
-                    } else if dragOffset.height > 100 { // Deslizar hacia abajo
-                        self.currentDate = calendar.date(byAdding: .month, value: -1, to: currentDate) ?? currentDate
+                    // Solo cambia de mes si el desplazamiento es suficiente
+                    if abs(dragOffset) > 100 {
+                        if dragOffset < 0 {
+                            // Si el desplazamiento es hacia la izquierda, avanzar al siguiente mes
+                            goToNextMonth()
+                        } else {
+                            // Si el desplazamiento es hacia la derecha, retroceder al mes anterior
+                            goToPreviousMonth()
+                        }
                     }
-                    dragOffset = .zero
-                })
+                    // Restablecer el offset del gesto
+                    dragOffset = 0
+                }
+        )
+        .overlay {
+            if isYearPickerVisible {
+                Color.black.opacity(0.3) // Fondo semi-transparente
+                                    .edgesIgnoringSafeArea(.all)
+                                    .onTapGesture {
+                                        withAnimation {
+                                            isYearPickerVisible = false
+                                        }
+                                    }
+                
+                Color.black.opacity(0.3) // Fondo semi-transparente
+                                    .edgesIgnoringSafeArea(.all)
+                                    .onTapGesture {
+                                        // Ocultar el Picker cuando se toca fuera
+                                        isYearPickerVisible = false
+                                    }
+                
+                ZStack {
+                    VStack {
+                        Spacer()
+                        Picker("Año", selection: $tempSelectedYear) {
+                            ForEach(years, id: \.self) { year in
+                                Text("\(String(year))")
+                                    .tag(year)
+                            }
+                        }
+                        .pickerStyle(WheelPickerStyle())
+                        .frame(height: 150)
+                        .clipped()
+                        .background(Color.white)
+                        .cornerRadius(10)
+                        .padding()
+                        
+                        Button(action: {
+                            // Actualizar el año seleccionado cuando se presiona "Aceptar"
+                            selectedYear = tempSelectedYear
+                            updateCurrentMonth()
+                            isYearPickerVisible = false
+                        }) {
+                            Text("Aceptar")
+                                .font(.title2)
+                                .foregroundColor(.blue)
+                                .padding()
+                                .background(Capsule().fill(Color.white).shadow(radius: 5))
+                        }
+                        
+                        Spacer()
+                    }
+                }
+            }
         }
-        .padding()
+    }
+
+    // Función para actualizar el mes y el año
+    private func updateCurrentMonth() {
+        let components = DateComponents(year: selectedYear, month: selectedMonth)
+        if let newMonth = calendar.date(from: components) {
+            currentMonth = newMonth
+        }
+    }
+
+    // Función para ir al siguiente mes
+    private func goToNextMonth() {
+        if let nextMonth = calendar.date(byAdding: .month, value: 1, to: currentMonth) {
+            currentMonth = nextMonth
+            selectedMonth = calendar.component(.month, from: nextMonth)
+            selectedYear = calendar.component(.year, from: nextMonth)
+            tempSelectedYear = selectedYear
+        }
+    }
+
+    // Función para ir al mes anterior
+    private func goToPreviousMonth() {
+        if let previousMonth = calendar.date(byAdding: .month, value: -1, to: currentMonth) {
+            currentMonth = previousMonth
+            selectedMonth = calendar.component(.month, from: previousMonth)
+            selectedYear = calendar.component(.year, from: previousMonth)
+            tempSelectedYear = selectedYear
+        }
     }
 }
 
+extension Array {
+    // Método para dividir un array en subarrays de tamaño determinado
+    func chunked(into size: Int) -> [[Element]] {
+        var chunks: [[Element]] = []
+        var currentChunk: [Element] = []
+        
+        for item in self {
+            currentChunk.append(item)
+            if currentChunk.count == size {
+                chunks.append(currentChunk)
+                currentChunk = []
+            }
+        }
+        
+        if !currentChunk.isEmpty {
+            chunks.append(currentChunk)
+        }
+        
+        return chunks
+    }
+}
 
 #Preview {
     CalendarView()
