@@ -10,13 +10,15 @@ import SwiftUI
 struct AddUserView: View {
     @Environment(SchoolModel.self) var schoolModel
     @Binding var isPresented: Bool
+    
     @State private var name: String = ""
     @State private var surname: String = ""
-    @State private var selectedSchool: SchoolModel?
+    @State private var selectedClasses: Set<ClassModel> = []
     
     var body: some View {
         NavigationView {
             Form {
+                // Sección de detalles del usuario
                 Section(header: Text("User Details")) {
                     TextField("First Name", text: $name)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -25,13 +27,26 @@ struct AddUserView: View {
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                 }
                 
-                Section(header: Text("School Assignment")) {
-                    if let school = selectedSchool {
-                        Text("Selected School: \(school.name)")
+                // Sección de selección de clases
+                Section(header: Text("Assign Classes")) {
+                    if schoolModel.classModel.isEmpty {
+                        Text("No classes available.")
                             .foregroundColor(.secondary)
                     } else {
-                        Text("Current School: \(schoolModel.name)")
-                            .foregroundColor(.secondary)
+                        List(schoolModel.classModel, id: \.id, selection: $selectedClasses) { classModel in
+                            HStack {
+                                Text(classModel.name)
+                                Spacer()
+                                if selectedClasses.contains(classModel) {
+                                    Image(systemName: "checkmark")
+                                        .foregroundColor(.blue)
+                                }
+                            }
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                toggleClassSelection(classModel)
+                            }
+                        }
                     }
                 }
             }
@@ -53,6 +68,16 @@ struct AddUserView: View {
         }
     }
     
+    // Alterna la selección de una clase
+    private func toggleClassSelection(_ classModel: ClassModel) {
+        if selectedClasses.contains(classModel) {
+            selectedClasses.remove(classModel)
+        } else {
+            selectedClasses.insert(classModel)
+        }
+    }
+    
+    // Añade el usuario como profesor si hay clases seleccionadas
     private func addUser() {
         let newUser = UserModel(
             id: UUID(),
@@ -63,10 +88,27 @@ struct AddUserView: View {
         )
         
         schoolModel.usersModel.append(newUser)
+        
+        if !selectedClasses.isEmpty {
+            let newTeacher = TeachersModels(
+                id: UUID(),
+                schoolModel: schoolModel,
+                classesModels: Array(selectedClasses),
+                userModel: newUser,
+                name: name,
+                surname: surname
+            )
+            selectedClasses.forEach { classModelIterator in
+                classModelIterator.teachersModel.append(newTeacher)
+            }
+            schoolModel.teachersModel.append(newTeacher)
+        }
+        
         isPresented = false
     }
 }
+
 #Preview {
-    AddUserView(isPresented: Bool.$trueState)
+    AddUserView(isPresented: .constant(true))
         .environment(Preview.schoolModel)
 }

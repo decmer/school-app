@@ -9,7 +9,8 @@ import SwiftUI
 
 struct ScheduleView: View {
     @State var schedules: [ScheduleModel] = []
-    let schoolModel: SchoolModel
+    @Environment(\.modelContext) private var modelContext
+    @Environment(SchoolModel.self) private var schoolModel
 
     var body: some View {
         NavigationView {
@@ -83,5 +84,5 @@ struct ScheduleView: View {
 }
 
 #Preview {
-    ScheduleView(schoolModel: Preview.schoolModel)
+    ScheduleView()
 }

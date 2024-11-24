@@ -11,14 +11,13 @@ import SwiftData
 struct ListClassView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(SchoolModel.self) private var schoolModel
-    @Query var classModels: [ClassModel]
     
     @State private var isAdd: Bool = false
     
     var body: some View {
         NavigationStack {
             LazyAdapList(preferredWidth: 250) {
-                ForEach(classModels) { classModel in
+                ForEach(schoolModel.classModel) { classModel in
                     NavigationLink {
                         ClassView()
                             .environment(classModel)

@@ -11,7 +11,6 @@ import SwiftData
 struct ClassView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(ClassModel.self) private var classModel
-    @Query var classModels: [ActivitiesModels]
     
     @State var option: Int = 0
     
@@ -62,6 +61,21 @@ struct ClassView: View {
                             .foregroundStyle(.gray.opacity(0.8))
                     }
                 }
+                
+                Button(action: {
+                    option = 3
+                }, label: {
+                    Text("Information")
+                        .font(.system(size: 17, weight: .bold))
+                })
+                .foregroundStyle(.white)
+                .padding(13)
+                .background {
+                    if option == 3 {
+                        RoundedRectangle(cornerRadius: 50)
+                            .foregroundStyle(.gray.opacity(0.8))
+                    }
+                }
             }
             .padding(5)
             .background {
@@ -69,9 +83,12 @@ struct ClassView: View {
                     .foregroundStyle(.grayWhite)
             }
             .padding(.top, 15)
-            
+            .navigationTitle(classModel.name)
             Spacer()
-                .navigationTitle(classModel.name)
+            if option == 3 {
+                Text("Horas\(classModel.timePerWeek)")
+            }
+            Spacer()
         }
     }
 }

@@ -28,7 +28,8 @@ struct SchoolView: View {
     let institute: SchoolModel
     @State var titles: [NavigationItem] = [
         NavigationItem(title: "Class", symbolName: "graduationcap", destination: AnyView(ListClassView())),
-        NavigationItem(title: "Schedule", symbolName: "calendar", destination: AnyView(Text("Schedule"))),
+        NavigationItem(title: "Users", symbolName: "person.2", destination: AnyView(UsersView())),
+        NavigationItem(title: "Schedule", symbolName: "calendar", destination: AnyView(ScheduleView())),
         NavigationItem(title: "Release", symbolName: "arrow.up.circle", destination: AnyView(Text("Release"))),
         NavigationItem(title: "Fouls", symbolName: "exclamationmark.circle", destination: AnyView(Text("Fouls"))),
         NavigationItem(title: "Information", symbolName: "info.circle", destination: AnyView(Text("Information"))),
