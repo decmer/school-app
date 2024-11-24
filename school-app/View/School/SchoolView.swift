@@ -27,7 +27,7 @@ struct SchoolView: View {
     
     let institute: SchoolModel
     @State var titles: [NavigationItem] = [
-        NavigationItem(title: "Class", symbolName: "graduationcap", destination: AnyView(ClassView())),
+        NavigationItem(title: "Class", symbolName: "graduationcap", destination: AnyView(ListClassView())),
         NavigationItem(title: "Schedule", symbolName: "calendar", destination: AnyView(Text("Schedule"))),
         NavigationItem(title: "Release", symbolName: "arrow.up.circle", destination: AnyView(Text("Release"))),
         NavigationItem(title: "Fouls", symbolName: "exclamationmark.circle", destination: AnyView(Text("Fouls"))),
@@ -95,7 +95,7 @@ struct SchoolView: View {
         previewContainer.mainContext.insert(Preview.classModel1)
         previewContainer.mainContext.insert(Preview.classModel2)
 
-        return SchoolView(institute: SchoolModel(id: .init(), classModel: [], name: "School Name", img: nil, colorHex: Color.green.toHex()!))
+        return SchoolView(institute: Preview.schoolModel)
             .modelContainer(previewContainer)
             .environment(Preview.schoolModel)
     } catch {

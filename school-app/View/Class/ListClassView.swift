@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 
-struct ClassView: View {
+struct ListClassView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(SchoolModel.self) private var schoolModel
     @Query var classModels: [ClassModel]
@@ -18,11 +18,12 @@ struct ClassView: View {
     var body: some View {
         NavigationStack {
             LazyAdapList(preferredWidth: 250) {
-                ForEach(classModels) { school in
+                ForEach(classModels) { classModel in
                     NavigationLink {
-                        Text(school.name)
+                        ClassView()
+                            .environment(classModel)
                     } label: {
-                        ClassPreview(classModel: school)
+                        ClassPreview(classModel: classModel)
                             .frame(width: 250, height: 250)
                     }
                 }
@@ -49,7 +50,7 @@ struct ClassView: View {
         previewContainer.mainContext.insert(Preview.classModel1)
         previewContainer.mainContext.insert(Preview.classModel2)
 
-        return ClassView()
+        return ListClassView()
             .modelContainer(previewContainer)
             .environment(Preview.schoolModel)
     } catch {

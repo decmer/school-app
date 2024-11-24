@@ -14,6 +14,9 @@ struct school_appApp: App {
         let schema = Schema([
             SchoolModel.self,
             ClassModel.self,
+            ActivitiesModels.self,
+            TeachersModels.self,
+            UserModel.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 

@@ -38,7 +38,7 @@ struct ClassPreview: View {
                         }
                     }
                     RoundedRectangle(cornerRadius: 7)
-                        .frame(width: .infinity, height: 1)
+                        .frame(height: 1)
                         .foregroundStyle(.white)
                     Spacer()
                     RoundedRectangle(cornerRadius: 7)

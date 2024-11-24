@@ -36,7 +36,7 @@ struct ClassAddView: View {
                     if let cgColor = UIColor(color).cgColor.copyConvertedToSRGB() {
                         color = Color(cgColor)
                     }
-                    let schoolAux = ClassModel(id: .init(), schoolModel: schoolModel, name: name, colorHex: color.toHex()!)
+                    let schoolAux = ClassModel(id: .init(), schoolModel: schoolModel, activitiesModel: [], teachersModel: [], name: name, timePerWeek: 4, colorHex: color.toHex()!)
                     modelContext.insert(schoolAux)
                     do {
                         try modelContext.save()

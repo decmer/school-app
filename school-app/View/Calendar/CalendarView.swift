@@ -176,12 +176,6 @@ struct CalendarView: View {
                                         }
                                     }
                 
-                Color.black.opacity(0.3) // Fondo semi-transparente
-                                    .edgesIgnoringSafeArea(.all)
-                                    .onTapGesture {
-                                        // Ocultar el Picker cuando se toca fuera
-                                        isYearPickerVisible = false
-                                    }
                 
                 ZStack {
                     VStack {
@@ -189,6 +183,7 @@ struct CalendarView: View {
                         Picker("Año", selection: $tempSelectedYear) {
                             ForEach(years, id: \.self) { year in
                                 Text("\(String(year))")
+                                    .foregroundStyle(.black)
                                     .tag(year)
                             }
                         }

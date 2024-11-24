@@ -11,15 +11,18 @@ import SwiftData
 @Model
 final class SchoolModel {
     var id: UUID
-    @Relationship()
-    var classModel: [ClassModel]
+    @Relationship() var classModel: [ClassModel]
+    @Relationship() var usersModel: [UserModel]
+    @Relationship() var teachersModel: [TeachersModels]
     var name: String
     var img: Data?
     var colorHex: String
     
-    init(id: UUID, classModel: [ClassModel], name: String, img: Data? = nil, colorHex: String) {
+    init(id: UUID, classModel: [ClassModel], usersModel: [UserModel], teachersModel: [TeachersModels], name: String, img: Data? = nil, colorHex: String) {
         self.id = id
         self.classModel = classModel
+        self.usersModel = usersModel
+        self.teachersModel = teachersModel
         self.name = name
         self.img = img
         self.colorHex = colorHex
